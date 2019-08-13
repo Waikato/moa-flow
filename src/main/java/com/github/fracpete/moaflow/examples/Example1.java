@@ -32,7 +32,7 @@ import moa.classifiers.trees.HoeffdingTree;
 import java.io.File;
 
 /**
- * Example flow.
+ * Example flow for classification.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
@@ -42,13 +42,6 @@ public class Example1 {
     String classifier = HoeffdingTree.class.getName() + " -b";
 
     InstanceSource source;
-    /*
-    RandomRBFGenerator generator = new RandomRBFGenerator();
-    generator.numAttsOption.setValue(20);
-    source = new InstanceSource();
-    source.setGenerator(generator);
-    source.setNumInstances(10000);
-    */
     source = new InstanceSource();
     source.setGenerator("moa.streams.generators.RandomRBFGenerator -a 20");
     source.setNumInstances(100000);
