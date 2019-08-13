@@ -24,6 +24,7 @@ import com.github.fracpete.moaflow.core.Utils;
 import com.yahoo.labs.samoa.instances.Instance;
 import moa.core.Example;
 import moa.core.InstanceExample;
+import moa.options.OptionHandler;
 import moa.streams.filters.AddNoiseFilter;
 import moa.streams.filters.StreamFilter;
 
@@ -43,7 +44,7 @@ public class InstanceFilter
 
   public void setFilter(StreamFilter value) {
     filter = value;
-    filter.restart();
+    ((OptionHandler) filter).prepareForUse();
   }
 
   public void setFilter(String value) {
