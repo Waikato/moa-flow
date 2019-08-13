@@ -20,7 +20,6 @@
 
 package com.github.fracpete.moaflow.core;
 
-import com.github.fracpete.moaflow.source.AbstractSource;
 import moa.MOAObject;
 import moa.options.AbstractOptionHandler;
 import moa.options.OptionHandler;
@@ -129,21 +128,21 @@ public class Utils {
     if (obj instanceof SubscriberManager) {
       SubscriberManager manager = (SubscriberManager) obj;
       for (Object sub : manager.getSubscribers())
-	toTree((MOAObject) sub, indent + "\t", content);
+	toTree((MOAObject) sub, indent + " ", content);
     }
   }
 
   /**
    * Outputs the flow as a textual tree.
    *
-   * @param source the flow to output
+   * @param flow the flow to output
    * @return the generated string
    */
-  public static String toTree(AbstractSource source) {
+  public static String toTree(Operator flow) {
     StringBuilder result;
 
     result = new StringBuilder();
-    toTree(source, "", result);
+    toTree(flow, "", result);
 
     return result.toString();
   }
