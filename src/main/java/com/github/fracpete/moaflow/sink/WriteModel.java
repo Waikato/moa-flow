@@ -20,7 +20,9 @@
 
 package com.github.fracpete.moaflow.sink;
 
-import moa.classifiers.Classifier;
+import com.yahoo.labs.samoa.instances.Instance;
+import moa.core.Example;
+import moa.learners.Learner;
 import weka.core.SerializationHelper;
 
 import java.io.File;
@@ -31,11 +33,11 @@ import java.io.File;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class WriteModel
-  extends AbstractSink<Classifier> {
+  extends AbstractSink<Learner<Example<Instance>>> {
 
   protected File modelFile;
 
-  protected Classifier model;
+  protected Learner<Example<Instance>> model;
 
   public WriteModel() {
     setModelFile(new File("."));
@@ -51,7 +53,7 @@ public class WriteModel
   }
 
   @Override
-  protected void doProcess(Classifier input) {
+  protected void doProcess(Learner<Example<Instance>> input) {
     model = input;
     if (!modelFile.isDirectory()) {
       synchronized (model) {
