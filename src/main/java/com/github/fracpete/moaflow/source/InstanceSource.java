@@ -68,7 +68,7 @@ public class InstanceSource
   protected void run() {
     numGenerated = 0;
     InstanceStream actualGenerator = (InstanceStream) generator.getPreMaterializedObject();
-    if (generator instanceof OptionHandler)
+    if (actualGenerator instanceof OptionHandler)
       ((OptionHandler) actualGenerator).prepareForUse();
     else
       actualGenerator.restart();
