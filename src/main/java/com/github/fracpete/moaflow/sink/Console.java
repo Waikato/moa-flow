@@ -23,9 +23,6 @@ package com.github.fracpete.moaflow.sink;
 import com.github.javacliparser.IntOption;
 import com.github.javacliparser.StringOption;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * Just outputs the object on stdout.
  *
@@ -36,16 +33,10 @@ public class Console
 
   public IntOption everyNth = new IntOption("everyNth", 'n', "Every n-th object will get output on the console", 1, 1, Integer.MAX_VALUE);
 
-  public StringOption outputSeparator = new StringOption("outputSeparator", 's', "The separator to use between outputs, see https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html", "");
+  public StringOption outputSeparator = new StringOption("outputSeparator", 's', "The separator to use between outputs", "");
 
   /** the counter for the objects. */
   protected int counter;
-
-  /** for formatting the timestamp. */
-  protected transient SimpleDateFormat format;
-
-  /** whether to use a separator. */
-  protected Boolean useSeparator;
 
   /**
    * For initializing members.
@@ -54,7 +45,6 @@ public class Console
   protected void init() {
     super.init();
     counter = 0;
-    useSeparator = null;
   }
 
   /**
@@ -75,22 +65,9 @@ public class Console
   protected void doProcess(Object input) {
     counter++;
     if (counter == everyNth.getValue()) {
-      if (useSeparator == null) {
-        useSeparator = !outputSeparator.getValue().isEmpty();
-	if (useSeparator) {
-	  try {
-	    format = new SimpleDateFormat(outputSeparator.getValue());
-	  }
-	  catch (Exception e) {
-	    onError(new Exception("Failed to parse separator format: " + outputSeparator.getValue(), e));
-	    format = null;
-	    useSeparator = false;
-	  }
-	}
-      }
 
-      if (useSeparator)
-        System.out.println(format.format(new Date()));
+      if (!outputSeparator.getValue().isEmpty())
+        System.out.println(outputSeparator.getValue());
 
       System.out.println(input);
       counter = 0;

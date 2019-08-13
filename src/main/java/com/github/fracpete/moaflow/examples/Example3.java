@@ -59,6 +59,7 @@ public class Example3 {
     filter.subscribe(eval);
 
     Console console = new Console();
+    console.outputSeparator.setValue("------");
     eval.subscribe(console);
 
     MeasurementsToCSV measurements = new MeasurementsToCSV();
