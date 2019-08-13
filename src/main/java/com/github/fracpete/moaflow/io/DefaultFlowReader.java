@@ -118,6 +118,10 @@ public class DefaultFlowReader
       found = false;
       for (n = i - 1; n >= 0; n--) {
         if (indents.get(n) == indent - 1) {
+	  if (!(ops.get(n) instanceof SubscriberManager))
+	    throw new IllegalStateException("Operator in line #" + (n+1) + " does not allow subscription of other operators!\n" + lines.get(n));
+	  if (!(op instanceof Subscriber))
+	    throw new IllegalStateException("Operator in line #" + (i+1) + " cannot subscribe to other operators!\n" + lines.get(i));
 	  ((SubscriberManager) ops.get(n)).subscribe((Subscriber) op);
 	  found = true;
           break;
