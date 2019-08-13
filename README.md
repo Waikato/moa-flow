@@ -33,3 +33,15 @@ Package: `com.github.fracpete.moaflow.sink`
 * `MeasurementPlot` - for plotting a single measurement
 * `MeasurementsToCSV` - stores the measurements from an evaluation as CSV
 * `WriteModel` - stores a model on disk
+
+## Examples
+
+* [Example1](src/main/java/com/github/fracpete/moaflow/examples/Example1.java) -- evaluates 
+  a classifier, outputs the statistics in a CSV, also trains the model and stores it on disk 
+* [Example2](src/main/java/com/github/fracpete/moaflow/examples/Example2.java) -- filters the 
+  data, evaluates a regressor, outputs the statistics in a CSV, also trains the model and stores it on disk 
+* [Example3](src/main/java/com/github/fracpete/moaflow/examples/Example3.java) -- constructs, 
+  saves, loads and runs a flow that evaluates a regressor, outputs the statistics in a CSV, 
+  also trains the model and stores it on disk 
+* [Example4](src/main/java/com/github/fracpete/moaflow/examples/Example4.java) -- evaluates 
+  a classifier and plots a statistic. 
