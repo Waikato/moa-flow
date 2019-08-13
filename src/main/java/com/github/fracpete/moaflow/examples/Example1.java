@@ -50,6 +50,7 @@ public class Example1 {
     source.subscribe(eval);
 
     Console console = new Console();
+    console.outputSeparator.setValue("'------ 'yyyy-MM-dd HH:mm:ss' ------'");
     eval.subscribe(console);
 
     MeasurementsToCSV measurements = new MeasurementsToCSV();
