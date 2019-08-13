@@ -75,8 +75,10 @@ public class Example3 {
 
     DefaultFlowReader reader = new DefaultFlowReader();
     Operator flow = reader.read(flowfile);
+    System.out.println("Flow read from: " + flowfile);
     System.out.println(Utils.toTree(flow));
 
+    System.out.println("Executing flow");
     if (flow instanceof AbstractSource)
       ((AbstractSource) flow).start();
   }
