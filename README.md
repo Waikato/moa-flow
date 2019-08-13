@@ -30,5 +30,6 @@ Package: `com.github.fracpete.moaflow.transformer`
 Package: `com.github.fracpete.moaflow.sink`
 
 * `Console` - simply outputs any objects it receives via `toString()`
+* `MeasurementPlot` - for plotting a single measurement
 * `MeasurementsToCSV` - stores the measurements from an evaluation as CSV
 * `WriteModel` - stores a model on disk

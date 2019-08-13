@@ -104,6 +104,12 @@
       <artifactId>moa</artifactId>
       <version>2019.05.0</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.knowm.xchart</groupId>
+      <artifactId>xchart</artifactId>
+      <version>3.5.4</version>
+    </dependency>
   </dependencies>
 
   <build>
