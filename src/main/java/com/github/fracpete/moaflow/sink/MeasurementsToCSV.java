@@ -20,7 +20,9 @@
 
 package com.github.fracpete.moaflow.sink;
 
-import moa.evaluation.ClassificationPerformanceEvaluator;
+import com.yahoo.labs.samoa.instances.Instance;
+import moa.core.Example;
+import moa.evaluation.LearningPerformanceEvaluator;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -32,11 +34,13 @@ import java.nio.file.StandardOpenOption;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class MeasurementsToCSV
-  extends AbstractSink<ClassificationPerformanceEvaluator> {
+  extends AbstractSink<LearningPerformanceEvaluator<Example<Instance>>> {
 
   protected File outputFile;
 
   protected String separator;
+
+  protected boolean first;
 
   public MeasurementsToCSV() {
     setOutputFile(new File("."));
@@ -45,6 +49,7 @@ public class MeasurementsToCSV
 
   public void setOutputFile(File value) {
     outputFile = value;
+    first = true;
   }
 
   public File getOutputFile() {
@@ -53,6 +58,7 @@ public class MeasurementsToCSV
 
   public void setSeparator(String value) {
     separator = value;
+    first = true;
   }
 
   public String getSeparator() {
@@ -60,11 +66,19 @@ public class MeasurementsToCSV
   }
 
   @Override
-  protected void doProcess(ClassificationPerformanceEvaluator input) {
+  protected void doProcess(LearningPerformanceEvaluator<Example<Instance>> input) {
     if (outputFile.isDirectory())
       throw new IllegalStateException("Output file is a directory: " + outputFile);
 
     StringBuilder content = new StringBuilder();
+
+    if (first) {
+      if (outputFile.exists()) {
+        if (!outputFile.delete())
+          System.out.println("Failed to delete existing output file: " + outputFile);
+      }
+      first = false;
+    }
 
     // header?
     if (!outputFile.exists()) {
