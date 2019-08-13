@@ -27,9 +27,7 @@ import com.github.fracpete.moaflow.source.InstanceSource;
 import com.github.fracpete.moaflow.transformer.EvaluateRegressor;
 import com.github.fracpete.moaflow.transformer.InstanceFilter;
 import moa.classifiers.functions.SGD;
-import moa.streams.filters.AddNoiseFilter;
-
-import java.io.File;
+import moa.streams.filters.ReplacingMissingValuesFilter;
 
 /**
  * Example flow for regression.
@@ -44,16 +42,15 @@ public class Example2 {
     InstanceSource source;
     source = new InstanceSource();
     source.setGenerator("moa.streams.generators.RandomRBFGenerator -a 20");
-    source.setNumInstances(100000);
+    source.numInstances.setValue(100000);
 
-    AddNoiseFilter noise = new AddNoiseFilter();
-    noise.attNoiseFractionOption.setValue(0.02);
+    ReplacingMissingValuesFilter replace = new ReplacingMissingValuesFilter();
     InstanceFilter filter = new InstanceFilter();
-    filter.setFilter(noise);
+    filter.filter.setCurrentObject(replace);
     source.subscribe(filter);
 
     EvaluateRegressor eval = new EvaluateRegressor();
-    eval.setEveryNth(10000);
+    eval.everyNth.setValue(10000);
     eval.setRegressor(regressor);
     filter.subscribe(eval);
 
@@ -61,7 +58,7 @@ public class Example2 {
     eval.subscribe(console);
 
     MeasurementsToCSV measurements = new MeasurementsToCSV();
-    measurements.setOutputFile(new File(System.getProperty("java.io.tmpdir") + "/moa.csv"));
+    measurements.outputFile.setValue(System.getProperty("java.io.tmpdir") + "/moa.csv");
     eval.subscribe(measurements);
 
     System.out.println(Utils.toTree(source));

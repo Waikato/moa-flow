@@ -29,8 +29,6 @@ import com.github.fracpete.moaflow.transformer.EvaluateClassifier;
 import com.github.fracpete.moaflow.transformer.TrainClassifier;
 import moa.classifiers.trees.HoeffdingTree;
 
-import java.io.File;
-
 /**
  * Example flow for classification.
  *
@@ -44,10 +42,10 @@ public class Example1 {
     InstanceSource source;
     source = new InstanceSource();
     source.setGenerator("moa.streams.generators.RandomRBFGenerator -a 20");
-    source.setNumInstances(100000);
+    source.numInstances.setValue(100000);
 
     EvaluateClassifier eval = new EvaluateClassifier();
-    eval.setEveryNth(10000);
+    eval.everyNth.setValue(10000);
     eval.setClassifier(classifier);
     source.subscribe(eval);
 
@@ -55,16 +53,16 @@ public class Example1 {
     eval.subscribe(console);
 
     MeasurementsToCSV measurements = new MeasurementsToCSV();
-    measurements.setOutputFile(new File(System.getProperty("java.io.tmpdir") + "/moa.csv"));
+    measurements.outputFile.setValue(System.getProperty("java.io.tmpdir") + "/moa.csv");
     eval.subscribe(measurements);
 
     TrainClassifier train = new TrainClassifier();
     train.setClassifier(classifier);
-    train.setEveryNth(10000);
+    train.everyNth.setValue(10000);
     source.subscribe(train);
 
     WriteModel model = new WriteModel();
-    model.setModelFile(new File(System.getProperty("java.io.tmpdir") + "/moa.model"));
+    model.modelFile.setValue(System.getProperty("java.io.tmpdir") + "/moa.model");
     train.subscribe(model);
 
     System.out.println(Utils.toTree(source));

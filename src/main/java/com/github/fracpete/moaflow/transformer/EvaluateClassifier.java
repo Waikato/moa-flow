@@ -21,6 +21,7 @@
 package com.github.fracpete.moaflow.transformer;
 
 import com.github.fracpete.moaflow.core.Utils;
+import com.github.javacliparser.IntOption;
 import com.yahoo.labs.samoa.instances.Instance;
 import com.yahoo.labs.samoa.instances.InstancesHeader;
 import moa.classifiers.Classifier;
@@ -28,6 +29,7 @@ import moa.classifiers.trees.HoeffdingTree;
 import moa.core.Example;
 import moa.evaluation.BasicClassificationPerformanceEvaluator;
 import moa.evaluation.ClassificationPerformanceEvaluator;
+import moa.options.ClassOption;
 
 /**
  * Evaluates a classifier and forwards the evaluation.
@@ -37,70 +39,79 @@ import moa.evaluation.ClassificationPerformanceEvaluator;
 public class EvaluateClassifier
   extends AbstractTransformer<Example<Instance>, ClassificationPerformanceEvaluator> {
 
-  protected Classifier classifier;
+  public ClassOption classifier = new ClassOption("classifier", 'c', "The classifier to use", Classifier.class, HoeffdingTree.class.getName());
 
-  protected ClassificationPerformanceEvaluator evaluator;
+  public ClassOption evaluator = new ClassOption("evaluator", 'e', "The evaluator to use", ClassificationPerformanceEvaluator.class, BasicClassificationPerformanceEvaluator.class.getName());
 
+  public IntOption everyNth = new IntOption("everyNth", 'n', "Every n-th evalutation the classifier will get forwarded", 1000, 1, Integer.MAX_VALUE);
+
+  /** whether this is the first evaluation. */
   protected boolean first;
 
-  protected int everyNth;
-
+  /** for counting the evaluations. */
   protected int counter;
 
-  public EvaluateClassifier() {
-    setClassifier(new HoeffdingTree());
-    setEvaluator(new BasicClassificationPerformanceEvaluator());
-    setEveryNth(1);
+  /** the actual classifier. */
+  protected transient Classifier actualClassifier;
+
+  /** the actual evaluator. */
+  protected transient ClassificationPerformanceEvaluator actualEvaluator;
+
+  /**
+   * Gets the purpose of this object
+   *
+   * @return the string with the purpose of this object
+   */
+  @Override
+  public String getPurposeString() {
+    return "Evaluates the specified classifier and forwards the evaluation every n-th evaluation.";
   }
 
-  public void setClassifier(Classifier value) {
-    classifier = value;
+  /**
+   * For initializing members.
+   */
+  @Override
+  protected void init() {
+    super.init();
     first = true;
+    counter = 0;
+    actualClassifier = null;
+    actualEvaluator = null;
   }
 
+  /**
+   * Sets the classifier via a commandline string.
+   *
+   * @param value the commandline
+   */
   public void setClassifier(String value) {
-    setClassifier(Utils.fromCommandLine(Classifier.class, value));
+    classifier.setCurrentObject(Utils.fromCommandLine(Classifier.class, value));
   }
 
-  public Classifier getClassifier() {
-    return classifier;
-  }
-
-  public void setEvaluator(ClassificationPerformanceEvaluator value) {
-    evaluator = value;
-    first = true;
-  }
-
+  /**
+   * Sets the evaluator via a commandline string.
+   *
+   * @param value the commandline
+   */
   public void setEvaluator(String value) {
-    setEvaluator(Utils.fromCommandLine(ClassificationPerformanceEvaluator.class, value));
-  }
-
-  public ClassificationPerformanceEvaluator getEvaluator() {
-    return evaluator;
-  }
-
-  public void setEveryNth(int value) {
-    everyNth = value;
-    first = true;
-  }
-
-  public int getEveryNth() {
-    return everyNth;
+    evaluator.setCurrentObject(Utils.fromCommandLine(ClassificationPerformanceEvaluator.class, value));
   }
 
   protected ClassificationPerformanceEvaluator doProcess(Example<Instance> input) {
     if (first) {
-      classifier.setModelContext(new InstancesHeader(input.getData().dataset()));
-      classifier.prepareForUse();
+      actualClassifier = (Classifier) classifier.getPreMaterializedObject();
+      actualClassifier.setModelContext(new InstancesHeader(input.getData().dataset()));
+      actualClassifier.prepareForUse();
+      actualEvaluator = (ClassificationPerformanceEvaluator) evaluator.getPreMaterializedObject();
       first = false;
       counter = 0;
     }
     counter++;
-    double[] votes = classifier.getVotesForInstance(input.getData());
-    evaluator.addResult(input, votes);
-    if (counter == everyNth) {
+    double[] votes = actualClassifier.getVotesForInstance(input.getData());
+    actualEvaluator.addResult(input, votes);
+    if (counter == everyNth.getValue()) {
       counter = 0;
-      return evaluator;
+      return actualEvaluator;
     }
     else {
       return null;

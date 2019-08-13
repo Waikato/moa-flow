@@ -21,8 +21,10 @@
 package com.github.fracpete.moaflow.source;
 
 import com.github.fracpete.moaflow.core.Utils;
+import com.github.javacliparser.IntOption;
 import com.yahoo.labs.samoa.instances.Instance;
 import moa.core.Example;
+import moa.options.ClassOption;
 import moa.options.OptionHandler;
 import moa.streams.InstanceStream;
 import moa.streams.generators.RandomRBFGenerator;
@@ -35,63 +37,50 @@ import moa.streams.generators.RandomRBFGenerator;
 public class InstanceSource
   extends AbstractSource<Example<Instance>> {
 
-  protected InstanceStream generator;
+  public ClassOption generator = new ClassOption("generator", 'g', "The data stream generator to use", InstanceStream.class, RandomRBFGenerator.class.getName());
 
-  protected int numInstances;
+  public IntOption numInstances = new IntOption("numInstances", 'i', "The number of instances to generate", 10000, 1, Integer.MAX_VALUE);
 
-  protected int checkInterval;
+  public IntOption checkInterval = new IntOption("checkInterval", 'c', "The interval of generated instances to check for backpressure", 1000, 1, Integer.MAX_VALUE);
 
+  /** the number of instances generated so far. */
   protected int numGenerated;
 
-  public InstanceSource() {
-    setGenerator(new RandomRBFGenerator());
-    setNumInstances(10000);
-    setCheckInterval(1000);
+  /**
+   * Gets the purpose of this object
+   *
+   * @return the string with the purpose of this object
+   */
+  @Override
+  public String getPurposeString() {
+    return "Outputs a maximum number of Instance objects with the specified stream generator.";
   }
 
-  public void setGenerator(InstanceStream value) {
-    generator = value;
-  }
-
+  /**
+   * Sets the generator from a commandline.
+   *
+   * @param value the commandline
+   */
   public void setGenerator(String value) {
-    setGenerator(Utils.fromCommandLine(InstanceStream.class, value));
-  }
-
-  public InstanceStream getGenerator() {
-    return generator;
-  }
-
-  public void setNumInstances(int value) {
-    numInstances = value;
-  }
-
-  public int getNumInstances() {
-    return numInstances;
-  }
-
-  public void setCheckInterval(int value) {
-    checkInterval = value;
-  }
-
-  public int getCheckInterval() {
-    return checkInterval;
+    generator.setCurrentObject(Utils.fromCommandLine(InstanceStream.class, value));
   }
 
   protected void run() {
     numGenerated = 0;
+    InstanceStream actualGenerator = (InstanceStream) generator.getPreMaterializedObject();
     if (generator instanceof OptionHandler)
-      ((OptionHandler) generator).prepareForUse();
+      ((OptionHandler) actualGenerator).prepareForUse();
     else
-      generator.restart();
-    while (!isStopped() && generator.hasMoreInstances() && (numGenerated < numInstances)) {
+      actualGenerator.restart();
+    while (!isStopped() && actualGenerator.hasMoreInstances() && (numGenerated < numInstances.getValue())) {
       // check for backpressure
-      if (numGenerated % checkInterval == 0) {
-	while (!isStopped() && !canProduceNext() && generator.hasMoreInstances()) {
+      if (numGenerated % checkInterval.getValue() == 0) {
+	while (!isStopped() && !canProduceNext() && actualGenerator.hasMoreInstances()) {
 	  Utils.wait(this, 10, 10);
 	}
       }
-      if (generator.hasMoreInstances()) {
-	submit(generator.nextInstance());
+      if (actualGenerator.hasMoreInstances()) {
+	publisher.submit(actualGenerator.nextInstance());
 	numGenerated++;
       }
     }

@@ -21,10 +21,13 @@
 package com.github.fracpete.moaflow.transformer;
 
 import com.github.fracpete.moaflow.core.Utils;
+import com.github.javacliparser.IntOption;
 import com.yahoo.labs.samoa.instances.Instance;
+import com.yahoo.labs.samoa.instances.InstancesHeader;
 import moa.classifiers.Classifier;
 import moa.classifiers.trees.HoeffdingTree;
 import moa.core.Example;
+import moa.options.ClassOption;
 
 /**
  * Trains a classifier and forwards it.
@@ -34,48 +37,66 @@ import moa.core.Example;
 public class TrainClassifier
   extends AbstractTransformer<Example<Instance>, Classifier> {
 
-  protected Classifier classifier;
+  public ClassOption classifier = new ClassOption("classifier", 'c', "The classifier to use", Classifier.class, HoeffdingTree.class.getName());
 
-  protected int everyNth;
+  public IntOption everyNth = new IntOption("everyNth", 'n', "Every n-th training step the classifier will get forwarded", 1000, 1, Integer.MAX_VALUE);
 
+  /** the counter for the training steps. */
   protected int counter;
 
-  public TrainClassifier() {
-    setClassifier(new HoeffdingTree());
-    setEveryNth(1);
+  /** the actual classifier. */
+  protected transient Classifier actualClassifier;
+
+  /**
+   * Gets the purpose of this object
+   *
+   * @return the string with the purpose of this object
+   */
+  @Override
+  public String getPurposeString() {
+    return "Trains the classifier with every incoming instance and forwards the model every n-th training step.";
   }
 
-  public void setClassifier(Classifier value) {
-    classifier = value;
-    classifier.resetLearning();
-    classifier.prepareForUse();
-  }
-
-  public void setClassifier(String value) {
-    setClassifier(Utils.fromCommandLine(Classifier.class, value));
-  }
-
-  public Classifier getClassifier() {
-    return classifier;
-  }
-
-  public void setEveryNth(int value) {
-    everyNth = value;
+  /**
+   * For initializing members.
+   */
+  @Override
+  protected void init() {
+    super.init();
     counter = 0;
+    actualClassifier = null;
   }
 
-  public int getEveryNth() {
-    return everyNth;
+  /**
+   * Sets the classifier via a commandline string.
+   *
+   * @param value the commandline
+   */
+  public void setClassifier(String value) {
+    classifier.setCurrentObject(Utils.fromCommandLine(Classifier.class, value));
   }
 
+  /**
+   * Transforms the input data.
+   *
+   * @param input the input data
+   * @return the generated output data
+   */
   protected Classifier doProcess(Example<Instance> input) {
-    counter++;
-    synchronized (classifier) {
-      classifier.trainOnInstance(input.getData());
+    if (actualClassifier == null) {
+      actualClassifier = (Classifier) classifier.getPreMaterializedObject();
+      actualClassifier.setModelContext(new InstancesHeader(input.getData().dataset()));
+      actualClassifier.prepareForUse();
     }
-    if (counter == everyNth) {
+
+    counter++;
+    synchronized (actualClassifier) {
+      actualClassifier.trainOnInstance(input.getData());
+    }
+
+    if (counter == everyNth.getValue()) {
       counter = 0;
-      return classifier;
+      return actualClassifier;
     }
     else {
       return null;

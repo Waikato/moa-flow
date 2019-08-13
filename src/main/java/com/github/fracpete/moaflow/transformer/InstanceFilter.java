@@ -24,7 +24,7 @@ import com.github.fracpete.moaflow.core.Utils;
 import com.yahoo.labs.samoa.instances.Instance;
 import moa.core.Example;
 import moa.core.InstanceExample;
-import moa.options.OptionHandler;
+import moa.options.ClassOption;
 import moa.streams.filters.AddNoiseFilter;
 import moa.streams.filters.StreamFilter;
 
@@ -36,26 +36,40 @@ import moa.streams.filters.StreamFilter;
 public class InstanceFilter
   extends AbstractTransformer<Example<Instance>, Example<Instance>> {
 
-  protected StreamFilter filter;
+  public ClassOption filter = new ClassOption("filter", 'f', "The filter to apply to the data stream", StreamFilter.class, AddNoiseFilter.class.getName());
 
-  public InstanceFilter() {
-    setFilter(new AddNoiseFilter());
+  /** the actual filter. */
+  protected transient StreamFilter actualFilter;
+
+  /**
+   * Gets the purpose of this object
+   *
+   * @return the string with the purpose of this object
+   */
+  @Override
+  public String getPurposeString() {
+    return "Applies the specified filter to the data stream.";
   }
 
-  public void setFilter(StreamFilter value) {
-    filter = value;
-    ((OptionHandler) filter).prepareForUse();
-  }
-
+  /**
+   * Sets the filter via a commandline string.
+   *
+   * @param value the commandline
+   */
   public void setFilter(String value) {
-    setFilter(Utils.fromCommandLine(StreamFilter.class, value));
+    filter.setCurrentObject(Utils.fromCommandLine(StreamFilter.class, value));
   }
 
-  public StreamFilter getFilter() {
-    return filter;
-  }
-
+  /**
+   * Transforms the input data.
+   *
+   * @param input the input data
+   * @return the generated output data
+   */
   protected Example<Instance> doProcess(Example<Instance> input) {
-    return new InstanceExample(filter.filterInstance(input.getData()));
+    if (actualFilter == null)
+      actualFilter = (StreamFilter) filter.getPreMaterializedObject();
+
+    return new InstanceExample(actualFilter.filterInstance(input.getData()));
   }
 }

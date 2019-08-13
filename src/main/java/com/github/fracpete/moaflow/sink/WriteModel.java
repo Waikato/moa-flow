@@ -20,6 +20,7 @@
 
 package com.github.fracpete.moaflow.sink;
 
+import com.github.javacliparser.FileOption;
 import com.yahoo.labs.samoa.instances.Instance;
 import moa.core.Example;
 import moa.learners.Learner;
@@ -35,30 +36,48 @@ import java.io.File;
 public class WriteModel
   extends AbstractSink<Learner<Example<Instance>>> {
 
-  protected File modelFile;
+  public FileOption modelFile = new FileOption("modelFile", 'f', "The file to write the model to", ".", ".model", true);
 
-  protected Learner<Example<Instance>> model;
+  /** the learner that was last received. */
+  protected transient Learner<Example<Instance>> model;
 
-  public WriteModel() {
-    setModelFile(new File("."));
+  /** the actual model file. */
+  protected transient File actualModelFile;
+
+  /**
+   * Gets the purpose of this object
+   *
+   * @return the string with the purpose of this object
+   */
+  @Override
+  public String getPurposeString() {
+    return "Serializes the incoming model to disk.";
   }
 
-  public void setModelFile(File value) {
-    modelFile = value;
+  /**
+   * For initializing members.
+   */
+  @Override
+  protected void init() {
+    super.init();
     model = null;
   }
 
-  public File getModelFile() {
-    return modelFile;
-  }
-
+  /**
+   * For processing the received input.
+   *
+   * @param input the data to process
+   */
   @Override
   protected void doProcess(Learner<Example<Instance>> input) {
     model = input;
-    if (!modelFile.isDirectory()) {
+    if (actualModelFile == null)
+      actualModelFile = modelFile.getFile();
+
+    if (!actualModelFile.isDirectory()) {
       synchronized (model) {
 	try {
-	  SerializationHelper.write(modelFile.getAbsolutePath(), model);
+	  SerializationHelper.write(actualModelFile.getAbsolutePath(), model);
 	  System.out.println("Model written to: " + modelFile);
 	}
 	catch (Exception e) {

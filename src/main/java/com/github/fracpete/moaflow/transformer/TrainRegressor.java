@@ -21,11 +21,14 @@
 package com.github.fracpete.moaflow.transformer;
 
 import com.github.fracpete.moaflow.core.Utils;
+import com.github.javacliparser.IntOption;
 import com.yahoo.labs.samoa.instances.Instance;
+import com.yahoo.labs.samoa.instances.InstancesHeader;
 import moa.classifiers.Classifier;
 import moa.classifiers.Regressor;
 import moa.classifiers.functions.SGD;
 import moa.core.Example;
+import moa.options.ClassOption;
 
 /**
  * Trains a regressor and forwards it.
@@ -35,48 +38,66 @@ import moa.core.Example;
 public class TrainRegressor
   extends AbstractTransformer<Example<Instance>, Regressor> {
 
-  protected Regressor regressor;
+  public ClassOption regressor = new ClassOption("regressor", 'c', "The regressor to use", Regressor.class, SGD.class.getName());
 
-  protected int everyNth;
+  public IntOption everyNth = new IntOption("everyNth", 'n', "Every n-th training step the regressor will get forwarded", 1000, 1, Integer.MAX_VALUE);
 
+  /** the counter for the training steps. */
   protected int counter;
 
-  public TrainRegressor() {
-    setRegressor(new SGD());
-    setEveryNth(1);
+  /** the actual regressor. */
+  protected transient Regressor actualRegressor;
+
+  /**
+   * Gets the purpose of this object
+   *
+   * @return the string with the purpose of this object
+   */
+  @Override
+  public String getPurposeString() {
+    return "Trains the regressor with every incoming instance and forwards the model every n-th training step.";
   }
 
-  public void setRegressor(Regressor value) {
-    regressor = value;
-    ((Classifier) regressor).resetLearning();
-    ((Classifier) regressor).prepareForUse();
-  }
-
-  public void setRegressor(String value) {
-    setRegressor(Utils.fromCommandLine(Regressor.class, value));
-  }
-
-  public Regressor getRegressor() {
-    return regressor;
-  }
-
-  public void setEveryNth(int value) {
-    everyNth = value;
+  /**
+   * For initializing members.
+   */
+  @Override
+  protected void init() {
+    super.init();
     counter = 0;
+    actualRegressor = null;
   }
 
-  public int getEveryNth() {
-    return everyNth;
+  /**
+   * Sets the regressor via a commandline string.
+   *
+   * @param value the commandline
+   */
+  public void setRegressor(String value) {
+    regressor.setCurrentObject(Utils.fromCommandLine(Regressor.class, value));
   }
 
+  /**
+   * Transforms the input data.
+   *
+   * @param input the input data
+   * @return the generated output data
+   */
   protected Regressor doProcess(Example<Instance> input) {
-    counter++;
-    synchronized (regressor) {
-      ((Classifier) regressor).trainOnInstance(input.getData());
+    if (actualRegressor == null) {
+      actualRegressor = (Regressor) regressor.getPreMaterializedObject();
+      ((Classifier) actualRegressor).setModelContext(new InstancesHeader(input.getData().dataset()));
+      ((Classifier) actualRegressor).prepareForUse();
     }
-    if (counter == everyNth) {
+
+    counter++;
+    synchronized (actualRegressor) {
+      ((Classifier) actualRegressor).trainOnInstance(input.getData());
+    }
+
+    if (counter == everyNth.getValue()) {
       counter = 0;
-      return regressor;
+      return actualRegressor;
     }
     else {
       return null;

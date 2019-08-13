@@ -20,6 +20,12 @@
 
 package com.github.fracpete.moaflow.sink;
 
+import com.github.javacliparser.IntOption;
+import com.github.javacliparser.StringOption;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Just outputs the object on stdout.
  *
@@ -28,26 +34,64 @@ package com.github.fracpete.moaflow.sink;
 public class Console
   extends AbstractSink<Object> {
 
-  protected int everyNth;
+  public IntOption everyNth = new IntOption("everyNth", 'n', "Every n-th object will get output on the console", 1, 1, Integer.MAX_VALUE);
 
+  public StringOption outputSeparator = new StringOption("outputSeparator", 's', "The separator to use between outputs, see https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html", "");
+
+  /** the counter for the objects. */
   protected int counter;
 
-  public Console() {
-    setEveryNth(1);
-  }
+  /** for formatting the timestamp. */
+  protected transient SimpleDateFormat format;
 
-  public void setEveryNth(int value) {
-    everyNth = value;
+  /** whether to use a separator. */
+  protected Boolean useSeparator;
+
+  /**
+   * For initializing members.
+   */
+  @Override
+  protected void init() {
+    super.init();
     counter = 0;
+    useSeparator = null;
   }
 
-  public int getEveryNth() {
-    return everyNth;
+  /**
+   * Gets the purpose of this object
+   *
+   * @return the string with the purpose of this object
+   */
+  @Override
+  public String getPurposeString() {
+    return "Outputs the objects it receives on stdout";
   }
 
+  /**
+   * For processing the received input.
+   *
+   * @param input the data to process
+   */
   protected void doProcess(Object input) {
     counter++;
-    if (counter == everyNth) {
+    if (counter == everyNth.getValue()) {
+      if (useSeparator == null) {
+        useSeparator = !outputSeparator.getValue().isEmpty();
+	if (useSeparator) {
+	  try {
+	    format = new SimpleDateFormat(outputSeparator.getValue());
+	  }
+	  catch (Exception e) {
+	    onError(new Exception("Failed to parse separator format: " + outputSeparator.getValue(), e));
+	    format = null;
+	    useSeparator = false;
+	  }
+	}
+      }
+
+      if (useSeparator)
+        System.out.println(format.format(new Date()));
+
       System.out.println(input);
       counter = 0;
     }

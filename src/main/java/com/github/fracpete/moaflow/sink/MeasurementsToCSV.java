@@ -20,6 +20,8 @@
 
 package com.github.fracpete.moaflow.sink;
 
+import com.github.javacliparser.FileOption;
+import com.github.javacliparser.StringOption;
 import com.yahoo.labs.samoa.instances.Instance;
 import moa.core.Example;
 import moa.evaluation.LearningPerformanceEvaluator;
@@ -36,55 +38,63 @@ import java.nio.file.StandardOpenOption;
 public class MeasurementsToCSV
   extends AbstractSink<LearningPerformanceEvaluator<Example<Instance>>> {
 
-  protected File outputFile;
+  public FileOption outputFile = new FileOption("outputFile", 'f', "The file to output the measurements to", ".", ".csv", true);
 
-  protected String separator;
+  public StringOption separator = new StringOption("separator", 's', "The separator to use for the cells", ",");
 
+  /** whether this is the first output. */
   protected boolean first;
 
-  public MeasurementsToCSV() {
-    setOutputFile(new File("."));
-    setSeparator(",");
+  /** the actual output file. */
+  protected transient File actualOutputFile;
+
+  /**
+   * Gets the purpose of this object
+   *
+   * @return the string with the purpose of this object
+   */
+  @Override
+  public String getPurposeString() {
+    return "Stores the measures in the specified CSV file.";
   }
 
-  public void setOutputFile(File value) {
-    outputFile = value;
+  /**
+   * For initializing members.
+   */
+  @Override
+  protected void init() {
+    super.init();
     first = true;
+    actualOutputFile = null;
   }
 
-  public File getOutputFile() {
-    return outputFile;
-  }
-
-  public void setSeparator(String value) {
-    separator = value;
-    first = true;
-  }
-
-  public String getSeparator() {
-    return separator;
-  }
-
+  /**
+   * For processing the received input.
+   *
+   * @param input the data to process
+   */
   @Override
   protected void doProcess(LearningPerformanceEvaluator<Example<Instance>> input) {
-    if (outputFile.isDirectory())
+    if (actualOutputFile == null)
+      actualOutputFile = outputFile.getFile();
+    if (actualOutputFile.isDirectory())
       throw new IllegalStateException("Output file is a directory: " + outputFile);
 
     StringBuilder content = new StringBuilder();
 
     if (first) {
-      if (outputFile.exists()) {
-        if (!outputFile.delete())
+      if (actualOutputFile.exists()) {
+        if (!actualOutputFile.delete())
           System.out.println("Failed to delete existing output file: " + outputFile);
       }
       first = false;
     }
 
     // header?
-    if (!outputFile.exists()) {
+    if (!actualOutputFile.exists()) {
       for (int i = 0; i < input.getPerformanceMeasurements().length; i++) {
 	if (i > 0)
-	  content.append(separator);
+	  content.append(separator.getValue());
 	content.append(input.getPerformanceMeasurements()[i].getName());
       }
       content.append("\n");
@@ -93,13 +103,13 @@ public class MeasurementsToCSV
     // values
     for (int i = 0; i < input.getPerformanceMeasurements().length; i++) {
       if (i > 0)
-	content.append(separator);
+	content.append(separator.getValue());
       content.append(input.getPerformanceMeasurements()[i].getValue());
     }
     content.append("\n");
 
     try {
-      Files.write(outputFile.toPath(), content.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+      Files.write(actualOutputFile.toPath(), content.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
     }
     catch (Exception e) {
       onError(new Exception("Failed to write measurements to: " + outputFile, e));

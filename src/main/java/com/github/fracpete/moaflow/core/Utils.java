@@ -25,8 +25,6 @@ import moa.MOAObject;
 import moa.options.AbstractOptionHandler;
 import moa.options.OptionHandler;
 
-import java.util.concurrent.SubmissionPublisher;
-
 /**
  * Helper class for waiting.
  *
@@ -67,6 +65,14 @@ public class Utils {
     }
   }
 
+  /**
+   * Turns the commandline back into an object.
+   *
+   * @param requiredType the required class
+   * @param commandline the commandline to use
+   * @param <T> the returned type
+   * @return the generated object, null if failed to instantiate
+   */
   public static <T> T fromCommandLine(Class<T> requiredType, String commandline) {
     T result;
     try {
@@ -77,7 +83,7 @@ public class Utils {
       try {
 	result = (T) Class.forName(classname).newInstance();
       }
-      catch (Exception var6) {
+      catch (Exception e) {
 	result = (T) Class.forName(requiredType.getPackage().getName() + "." + classname).newInstance();
       }
 
@@ -86,14 +92,20 @@ public class Utils {
 	((AbstractOptionHandler) result).prepareForUse();
       }
     }
-    catch (Exception var7) {
-      var7.printStackTrace();
+    catch (Exception ex) {
+      ex.printStackTrace();
       result = null;
     }
 
     return result;
   }
 
+  /**
+   * Generates a commandline from the object.
+   *
+   * @param obj the object to generate the commandline from
+   * @return the commandline
+   */
   public static String toCommandLine(MOAObject obj) {
     String result = obj.getClass().getName();
     if (obj instanceof OptionHandler) {
@@ -103,17 +115,30 @@ public class Utils {
     return result.trim();
   }
 
-  protected static void toTree(Object obj, String indent, StringBuilder content) {
+  /**
+   * Turns the objects into a tree string representation.
+   *
+   * @param obj	the object to process
+   * @param indent the indentation to use
+   * @param content the content so far
+   */
+  protected static void toTree(MOAObject obj, String indent, StringBuilder content) {
     content.append(indent);
-    content.append(obj.getClass().getName());
+    content.append(toCommandLine(obj));
     content.append("\n");
-    if (obj instanceof SubmissionPublisher) {
-      SubmissionPublisher pub = (SubmissionPublisher) obj;
-      for (Object sub : pub.getSubscribers())
-	toTree(sub, indent + "  ", content);
+    if (obj instanceof SubscriberManager) {
+      SubscriberManager manager = (SubscriberManager) obj;
+      for (Object sub : manager.getSubscribers())
+	toTree((MOAObject) sub, indent + "\t", content);
     }
   }
 
+  /**
+   * Outputs the flow as a textual tree.
+   *
+   * @param source the flow to output
+   * @return the generated string
+   */
   public static String toTree(AbstractSource source) {
     StringBuilder result;
 
