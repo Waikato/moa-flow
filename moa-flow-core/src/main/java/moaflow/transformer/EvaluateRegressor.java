@@ -111,6 +111,7 @@ public class EvaluateRegressor
     counter++;
     Prediction pred = ((Classifier) actualRegressor).getPredictionForInstance(input.getData());
     actualEvaluator.addResult(input, pred);
+    ((Classifier) actualRegressor).trainOnInstance(input.getData());
     if (counter == everyNth.getValue()) {
       counter = 0;
       return actualEvaluator;
