@@ -20,35 +20,35 @@
 
 package moaflow.examples;
 
+import moa.classifiers.functions.SGD;
 import moaflow.core.Utils;
 import moaflow.sink.Console;
 import moaflow.sink.MeasurementPlot;
 import moaflow.source.InstanceSource;
-import moaflow.transformer.EvaluateClassifier;
-import moa.classifiers.trees.HoeffdingTree;
+import moaflow.transformer.EvaluateRegressor;
 
 /**
- * Example flow for plotting measurement from classification evaluation.
+ * Example flow for plotting measurement from regression evaluation.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class ClassificationPlot {
+public class RegressionPlot {
 
   public static void main(String[] args) throws Exception {
-    String classifier = HoeffdingTree.class.getName() + " -b";
+    String regressor = SGD.class.getName();
 
     InstanceSource source;
     source = new InstanceSource();
     source.setGenerator("moa.streams.generators.RandomRBFGenerator -a 20");
     source.numInstances.setValue(1000000);
 
-    EvaluateClassifier eval = new EvaluateClassifier();
+    EvaluateRegressor eval = new EvaluateRegressor();
     eval.everyNth.setValue(1000);
-    eval.setClassifier(classifier);
+    eval.setRegressor(regressor);
     source.subscribe(eval);
 
     MeasurementPlot plot = new MeasurementPlot();
-    plot.measurement.setValue("classifications correct (percent)");
+    plot.measurement.setValue("root mean squared error");
     plot.maxPoints.setValue(-1);
     eval.subscribe(plot);
 

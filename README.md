@@ -44,6 +44,8 @@ Package: `com.github.fracpete.moaflow.sink`
   a classifier and plots a statistic. 
 * [RegressionCsvAndTrain](moa-flow-examples/src/main/java/moaflow/examples/RegressionCsvAndTrain.java) -- filters the 
   data, evaluates a regressor, outputs the statistics in a CSV, also trains the model and stores it on disk 
+* [RegressionPlot](moa-flow-examples/src/main/java/moaflow/examples/RegressionPlot.java) -- evaluates 
+  a regressor and plots a statistic. 
 * [RegressionConstructSaveLoadRun](moa-flow-examples/src/main/java/moaflow/examples/RegressionConstructSaveLoadRun.java) -- constructs, 
   saves, loads and runs a flow that evaluates a regressor, outputs the statistics in a CSV, 
   also trains the model and stores it on disk 
