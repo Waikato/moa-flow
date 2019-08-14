@@ -78,15 +78,15 @@ public class WriteModel
       synchronized (model) {
 	try {
 	  SerializationHelper.write(actualModelFile.getAbsolutePath(), model);
-	  System.out.println("Model written to: " + modelFile);
+	  System.out.println("Model written to: " + modelFile.getValue());
 	}
 	catch (Exception e) {
-	  onError(new Exception("Failed to write model to: " + modelFile, e));
+	  onError(new Exception("Failed to write model to: " + modelFile.getValue(), e));
 	}
       }
     }
     else {
-      onError(new IllegalStateException("Model file points to directory: " + modelFile));
+      onError(new IllegalStateException("Model file points to directory: " + modelFile.getValue()));
     }
   }
 }
