@@ -97,9 +97,9 @@
   </mailingLists>
 
   <scm>
-    <connection>scm:git:https://github.com/fracpete/moa-flow</connection>
-    <developerConnection>scm:git:https://github.com/fracpete/moa-flow</developerConnection>
-    <url>https://github.com/fracpete/moa-flow</url>
+    <connection>scm:git:https://github.com/Waikato/moa-flow</connection>
+    <developerConnection>scm:git:https://github.com/Waikato/moa-flow</developerConnection>
+    <url>https://github.com/Waikato/moa-flow</url>
     <tag>HEAD</tag>
   </scm>
 
