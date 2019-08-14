@@ -36,12 +36,12 @@ Package: `com.github.fracpete.moaflow.sink`
 
 ## Examples
 
-* [Example1](src/main/java/moaflow/examples/Example1.java) -- evaluates 
+* [Example1](moa-flow-examples/src/main/java/moaflow/examples/Example1.java) -- evaluates 
   a classifier, outputs the statistics in a CSV, also trains the model and stores it on disk 
-* [Example2](src/main/java/moaflow/examples/Example2.java) -- filters the 
+* [Example2](moa-flow-examples/src/main/java/moaflow/examples/Example2.java) -- filters the 
   data, evaluates a regressor, outputs the statistics in a CSV, also trains the model and stores it on disk 
-* [Example3](src/main/java/moaflow/examples/Example3.java) -- constructs, 
+* [Example3](moa-flow-examples/src/main/java/moaflow/examples/Example3.java) -- constructs, 
   saves, loads and runs a flow that evaluates a regressor, outputs the statistics in a CSV, 
   also trains the model and stores it on disk 
-* [Example4](src/main/java/moaflow/examples/Example4.java) -- evaluates 
+* [Example4](moa-flow-examples/src/main/java/moaflow/examples/Example4.java) -- evaluates 
   a classifier and plots a statistic. 
