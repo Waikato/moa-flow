@@ -123,6 +123,7 @@
   <modules>
     <module>moa-flow-core</module>
     <module>moa-flow-examples</module>
+    <module>moa-flow-app</module>
   </modules>
 
   <build>
@@ -160,6 +161,33 @@
             <additionalparam>-Xdoclint:none</additionalparam>
           </configuration>
         </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>3.1.0</version>
+          <configuration>
+            <descriptors>
+              <descriptor>src/main/assembly/sources.xml</descriptor>
+              <descriptor>src/main/assembly/test-sources.xml</descriptor>
+            </descriptors>
+          </configuration>
+          <executions>
+            <execution>
+              <id>make-assembly</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>com.github.fracpete</groupId>
+          <artifactId>debian-maven-plugin</artifactId>
+          <version>1.0.16</version>
+        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -181,6 +209,14 @@
               <followSymlinks>false</followSymlinks>
             </fileset>
           </filesets>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>com.github.fracpete</groupId>
+        <artifactId>debian-maven-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
         </configuration>
       </plugin>
     </plugins>

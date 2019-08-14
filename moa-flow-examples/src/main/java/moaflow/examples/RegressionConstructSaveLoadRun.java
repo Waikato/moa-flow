@@ -14,7 +14,7 @@
  */
 
 /*
- * Example1.java
+ * Regression2.java
  * Copyright (C) 2019 University of Waikato, Hamilton, NZ
  */
 
@@ -38,7 +38,7 @@ import moa.streams.filters.ReplacingMissingValuesFilter;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class Example3 {
+public class RegressionConstructSaveLoadRun {
 
   public static void main(String[] args) throws Exception {
     String regressor = SGD.class.getName();

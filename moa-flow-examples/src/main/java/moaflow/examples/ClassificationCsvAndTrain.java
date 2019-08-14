@@ -14,7 +14,7 @@
  */
 
 /*
- * Example1.java
+ * ClassificationCsvAndTrain.java
  * Copyright (C) 2019 University of Waikato, Hamilton, NZ
  */
 
@@ -22,9 +22,11 @@ package moaflow.examples;
 
 import moaflow.core.Utils;
 import moaflow.sink.Console;
-import moaflow.sink.MeasurementPlot;
+import moaflow.sink.MeasurementsToCSV;
+import moaflow.sink.WriteModel;
 import moaflow.source.InstanceSource;
 import moaflow.transformer.EvaluateClassifier;
+import moaflow.transformer.TrainClassifier;
 import moa.classifiers.trees.HoeffdingTree;
 
 /**
@@ -32,7 +34,7 @@ import moa.classifiers.trees.HoeffdingTree;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class Example4 {
+public class ClassificationCsvAndTrain {
 
   public static void main(String[] args) throws Exception {
     String classifier = HoeffdingTree.class.getName() + " -b";
@@ -40,21 +42,29 @@ public class Example4 {
     InstanceSource source;
     source = new InstanceSource();
     source.setGenerator("moa.streams.generators.RandomRBFGenerator -a 20");
-    source.numInstances.setValue(1000000);
+    source.numInstances.setValue(100000);
 
     EvaluateClassifier eval = new EvaluateClassifier();
-    eval.everyNth.setValue(1000);
+    eval.everyNth.setValue(10000);
     eval.setClassifier(classifier);
     source.subscribe(eval);
-
-    MeasurementPlot plot = new MeasurementPlot();
-    plot.measurement.setValue("classifications correct (percent)");
-    plot.maxPoints.setValue(-1);
-    eval.subscribe(plot);
 
     Console console = new Console();
     console.outputSeparator.setValue("------");
     eval.subscribe(console);
+
+    MeasurementsToCSV measurements = new MeasurementsToCSV();
+    measurements.outputFile.setValue(System.getProperty("java.io.tmpdir") + "/moa.csv");
+    eval.subscribe(measurements);
+
+    TrainClassifier train = new TrainClassifier();
+    train.setClassifier(classifier);
+    train.everyNth.setValue(10000);
+    source.subscribe(train);
+
+    WriteModel model = new WriteModel();
+    model.modelFile.setValue(System.getProperty("java.io.tmpdir") + "/moa.model");
+    train.subscribe(model);
 
     System.out.println(Utils.toTree(source));
 

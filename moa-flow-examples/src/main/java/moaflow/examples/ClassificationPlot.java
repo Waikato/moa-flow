@@ -22,45 +22,39 @@ package moaflow.examples;
 
 import moaflow.core.Utils;
 import moaflow.sink.Console;
-import moaflow.sink.MeasurementsToCSV;
+import moaflow.sink.MeasurementPlot;
 import moaflow.source.InstanceSource;
-import moaflow.transformer.EvaluateRegressor;
-import moaflow.transformer.InstanceFilter;
-import moa.classifiers.functions.SGD;
-import moa.streams.filters.ReplacingMissingValuesFilter;
+import moaflow.transformer.EvaluateClassifier;
+import moa.classifiers.trees.HoeffdingTree;
 
 /**
- * Example flow for regression.
+ * Example flow for classification.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class Example2 {
+public class ClassificationPlot {
 
   public static void main(String[] args) throws Exception {
-    String regressor = SGD.class.getName();
+    String classifier = HoeffdingTree.class.getName() + " -b";
 
     InstanceSource source;
     source = new InstanceSource();
     source.setGenerator("moa.streams.generators.RandomRBFGenerator -a 20");
-    source.numInstances.setValue(100000);
+    source.numInstances.setValue(1000000);
 
-    ReplacingMissingValuesFilter replace = new ReplacingMissingValuesFilter();
-    InstanceFilter filter = new InstanceFilter();
-    filter.filter.setCurrentObject(replace);
-    source.subscribe(filter);
+    EvaluateClassifier eval = new EvaluateClassifier();
+    eval.everyNth.setValue(1000);
+    eval.setClassifier(classifier);
+    source.subscribe(eval);
 
-    EvaluateRegressor eval = new EvaluateRegressor();
-    eval.everyNth.setValue(10000);
-    eval.setRegressor(regressor);
-    filter.subscribe(eval);
+    MeasurementPlot plot = new MeasurementPlot();
+    plot.measurement.setValue("classifications correct (percent)");
+    plot.maxPoints.setValue(-1);
+    eval.subscribe(plot);
 
     Console console = new Console();
     console.outputSeparator.setValue("------");
     eval.subscribe(console);
-
-    MeasurementsToCSV measurements = new MeasurementsToCSV();
-    measurements.outputFile.setValue(System.getProperty("java.io.tmpdir") + "/moa.csv");
-    eval.subscribe(measurements);
 
     System.out.println(Utils.toTree(source));
 

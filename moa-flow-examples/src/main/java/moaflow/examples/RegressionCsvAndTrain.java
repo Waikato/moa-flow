@@ -14,7 +14,7 @@
  */
 
 /*
- * Example1.java
+ * RegressionCsvAndTrain.java
  * Copyright (C) 2019 University of Waikato, Hamilton, NZ
  */
 
@@ -23,31 +23,36 @@ package moaflow.examples;
 import moaflow.core.Utils;
 import moaflow.sink.Console;
 import moaflow.sink.MeasurementsToCSV;
-import moaflow.sink.WriteModel;
 import moaflow.source.InstanceSource;
-import moaflow.transformer.EvaluateClassifier;
-import moaflow.transformer.TrainClassifier;
-import moa.classifiers.trees.HoeffdingTree;
+import moaflow.transformer.EvaluateRegressor;
+import moaflow.transformer.InstanceFilter;
+import moa.classifiers.functions.SGD;
+import moa.streams.filters.ReplacingMissingValuesFilter;
 
 /**
- * Example flow for classification.
+ * Example flow for regression.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class Example1 {
+public class RegressionCsvAndTrain {
 
   public static void main(String[] args) throws Exception {
-    String classifier = HoeffdingTree.class.getName() + " -b";
+    String regressor = SGD.class.getName();
 
     InstanceSource source;
     source = new InstanceSource();
     source.setGenerator("moa.streams.generators.RandomRBFGenerator -a 20");
     source.numInstances.setValue(100000);
 
-    EvaluateClassifier eval = new EvaluateClassifier();
+    ReplacingMissingValuesFilter replace = new ReplacingMissingValuesFilter();
+    InstanceFilter filter = new InstanceFilter();
+    filter.filter.setCurrentObject(replace);
+    source.subscribe(filter);
+
+    EvaluateRegressor eval = new EvaluateRegressor();
     eval.everyNth.setValue(10000);
-    eval.setClassifier(classifier);
-    source.subscribe(eval);
+    eval.setRegressor(regressor);
+    filter.subscribe(eval);
 
     Console console = new Console();
     console.outputSeparator.setValue("------");
@@ -56,15 +61,6 @@ public class Example1 {
     MeasurementsToCSV measurements = new MeasurementsToCSV();
     measurements.outputFile.setValue(System.getProperty("java.io.tmpdir") + "/moa.csv");
     eval.subscribe(measurements);
-
-    TrainClassifier train = new TrainClassifier();
-    train.setClassifier(classifier);
-    train.everyNth.setValue(10000);
-    source.subscribe(train);
-
-    WriteModel model = new WriteModel();
-    model.modelFile.setValue(System.getProperty("java.io.tmpdir") + "/moa.model");
-    train.subscribe(model);
 
     System.out.println(Utils.toTree(source));
 

@@ -5,6 +5,7 @@ Makes use of the reactive API that Java introduced with Java 9:
 
 https://community.oracle.com/docs/DOC-1006738
 
+
 ## Operators
 
 The following operators are currently available:
@@ -34,14 +35,37 @@ Package: `com.github.fracpete.moaflow.sink`
 * `MeasurementsToCSV` - stores the measurements from an evaluation as CSV
 * `WriteModel` - stores a model on disk
 
+
 ## Examples
 
-* [Example1](moa-flow-examples/src/main/java/moaflow/examples/Example1.java) -- evaluates 
+* [ClassificationCsvAndTrain](moa-flow-examples/src/main/java/moaflow/examples/ClassificationCsvAndTrain.java) -- evaluates 
   a classifier, outputs the statistics in a CSV, also trains the model and stores it on disk 
-* [Example2](moa-flow-examples/src/main/java/moaflow/examples/Example2.java) -- filters the 
+* [ClassificationPlot](moa-flow-examples/src/main/java/moaflow/examples/ClassificationPlot.java) -- evaluates 
+  a classifier and plots a statistic. 
+* [RegressionCsvAndTrain](moa-flow-examples/src/main/java/moaflow/examples/RegressionCsvAndTrain.java) -- filters the 
   data, evaluates a regressor, outputs the statistics in a CSV, also trains the model and stores it on disk 
-* [Example3](moa-flow-examples/src/main/java/moaflow/examples/Example3.java) -- constructs, 
+* [RegressionConstructSaveLoadRun](moa-flow-examples/src/main/java/moaflow/examples/RegressionConstructSaveLoadRun.java) -- constructs, 
   saves, loads and runs a flow that evaluates a regressor, outputs the statistics in a CSV, 
   also trains the model and stores it on disk 
-* [Example4](moa-flow-examples/src/main/java/moaflow/examples/Example4.java) -- evaluates 
-  a classifier and plots a statistic. 
+
+
+## Modules
+
+* `moa-flow-core` - core functionality
+* `moa-flow-examples` - example code
+* `moa-flow-app` - meta-module for generating binary .zip and .deb package
+
+
+## Build
+
+* compile
+
+  ```
+  mvn clean install -DskipTests=true
+  ```
+  
+* build .deb package
+
+  ```
+  mvn clean install deb:package -DskipTests=true
+  ```
