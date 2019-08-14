@@ -109,6 +109,7 @@ public class EvaluateClassifier
     counter++;
     double[] votes = actualClassifier.getVotesForInstance(input.getData());
     actualEvaluator.addResult(input, votes);
+    actualClassifier.trainOnInstance(input.getData());
     if (counter == everyNth.getValue()) {
       counter = 0;
       return actualEvaluator;
