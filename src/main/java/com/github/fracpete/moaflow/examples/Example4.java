@@ -49,7 +49,7 @@ public class Example4 {
 
     MeasurementPlot plot = new MeasurementPlot();
     plot.measurement.setValue("classifications correct (percent)");
-    plot.maxPoints.setValue(100);
+    plot.maxPoints.setValue(-1);
     eval.subscribe(plot);
 
     Console console = new Console();
