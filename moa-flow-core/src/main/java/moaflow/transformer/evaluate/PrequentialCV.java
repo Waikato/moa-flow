@@ -99,7 +99,10 @@ public class PrequentialCV
 				      Learner<Example<Instance>> learner,
 				      LearningPerformanceEvaluator<Example<Instance>> evaluator) {
     // Prequential evaluation
-    evaluator.addResult(instance, learner.getVotesForInstance(instance));
+    if (instance.getData().classAttribute().isNominal())
+      evaluator.addResult(instance, learner.getVotesForInstance(instance));
+    else
+      evaluator.addResult(instance, learner.getPredictionForInstance(instance));
 
     // Validation methodology weight selection
     int k = 1;

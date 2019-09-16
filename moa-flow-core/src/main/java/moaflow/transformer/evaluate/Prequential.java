@@ -49,7 +49,10 @@ public class Prequential
   @Override
   public void performEvaluation(Example<Instance> instance) {
     // Evaluate first
-    m_BaseEvaluator.addResult(instance, m_BaseLearner.getVotesForInstance(instance));
+    if (instance.getData().classAttribute().isNominal())
+      m_BaseEvaluator.addResult(instance, m_BaseLearner.getVotesForInstance(instance));
+    else
+      m_BaseEvaluator.addResult(instance, m_BaseLearner.getPredictionForInstance(instance));
 
     // Train second
     m_BaseLearner.trainOnInstance(instance);
