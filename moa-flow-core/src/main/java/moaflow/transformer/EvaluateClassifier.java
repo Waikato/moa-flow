@@ -20,8 +20,9 @@
 
 package moaflow.transformer;
 
+import moa.evaluation.LearningPerformanceEvaluator;
+import moa.learners.Learner;
 import moaflow.core.Utils;
-import com.github.javacliparser.IntOption;
 import com.yahoo.labs.samoa.instances.Instance;
 import com.yahoo.labs.samoa.instances.InstancesHeader;
 import moa.classifiers.Classifier;
@@ -37,19 +38,11 @@ import moa.options.ClassOption;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class EvaluateClassifier
-  extends AbstractTransformer<Example<Instance>, ClassificationPerformanceEvaluator> {
+  extends AbstractEvaluate {
 
   public ClassOption classifier = new ClassOption("classifier", 'c', "The classifier to use", Classifier.class, HoeffdingTree.class.getName());
 
   public ClassOption evaluator = new ClassOption("evaluator", 'e', "The evaluator to use", ClassificationPerformanceEvaluator.class, BasicClassificationPerformanceEvaluator.class.getName());
-
-  public IntOption everyNth = new IntOption("everyNth", 'n', "Every n-th evalutation the classifier will get forwarded", 1000, 1, Integer.MAX_VALUE);
-
-  /** whether this is the first evaluation. */
-  protected boolean first;
-
-  /** for counting the evaluations. */
-  protected int counter;
 
   /** the actual classifier. */
   protected transient Classifier actualClassifier;
@@ -73,8 +66,6 @@ public class EvaluateClassifier
   @Override
   protected void init() {
     super.init();
-    first = true;
-    counter = 0;
     actualClassifier = null;
     actualEvaluator = null;
   }
@@ -97,25 +88,32 @@ public class EvaluateClassifier
     evaluator.setCurrentObject(Utils.fromCommandLine(ClassificationPerformanceEvaluator.class, value));
   }
 
-  protected ClassificationPerformanceEvaluator doProcess(Example<Instance> input) {
-    if (first) {
+  /**
+   * Gets the learner to evaluate.
+   *
+   * @return	The initialised learner.
+   */
+  protected Learner<Example<Instance>> getLearner(InstancesHeader header) {
+    if (actualClassifier == null) {
       actualClassifier = (Classifier) classifier.getPreMaterializedObject();
-      actualClassifier.setModelContext(new InstancesHeader(input.getData().dataset()));
+      actualClassifier.setModelContext(header);
       actualClassifier.prepareForUse();
-      actualEvaluator = (ClassificationPerformanceEvaluator) evaluator.getPreMaterializedObject();
-      first = false;
-      counter = 0;
     }
-    counter++;
-    double[] votes = actualClassifier.getVotesForInstance(input.getData());
-    actualEvaluator.addResult(input, votes);
-    actualClassifier.trainOnInstance(input.getData());
-    if (counter == everyNth.getValue()) {
-      counter = 0;
-      return actualEvaluator;
-    }
-    else {
-      return null;
-    }
+
+    return actualClassifier;
   }
+
+  /**
+   * Get the evaluator to use.
+   *
+   * @return	The initialised evaluator.
+   */
+  protected LearningPerformanceEvaluator<Example<Instance>> getEvaluator() {
+    if (actualEvaluator == null) {
+      actualEvaluator = (ClassificationPerformanceEvaluator) evaluator.getPreMaterializedObject();
+    }
+
+    return actualEvaluator;
+  }
+
 }

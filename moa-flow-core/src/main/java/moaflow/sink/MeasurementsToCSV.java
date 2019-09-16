@@ -22,9 +22,7 @@ package moaflow.sink;
 
 import com.github.javacliparser.FileOption;
 import com.github.javacliparser.StringOption;
-import com.yahoo.labs.samoa.instances.Instance;
-import moa.core.Example;
-import moa.evaluation.LearningPerformanceEvaluator;
+import moa.evaluation.LearningEvaluation;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -36,7 +34,7 @@ import java.nio.file.StandardOpenOption;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class MeasurementsToCSV
-  extends AbstractSink<LearningPerformanceEvaluator<Example<Instance>>> {
+  extends AbstractSink<LearningEvaluation> {
 
   public FileOption outputFile = new FileOption("outputFile", 'f', "The file to output the measurements to", ".", ".csv", true);
 
@@ -74,7 +72,7 @@ public class MeasurementsToCSV
    * @param input the data to process
    */
   @Override
-  protected void doProcess(LearningPerformanceEvaluator<Example<Instance>> input) {
+  protected void doProcess(LearningEvaluation input) {
     if (actualOutputFile == null)
       actualOutputFile = outputFile.getFile();
     if (actualOutputFile.isDirectory())
@@ -92,19 +90,19 @@ public class MeasurementsToCSV
 
     // header?
     if (!actualOutputFile.exists()) {
-      for (int i = 0; i < input.getPerformanceMeasurements().length; i++) {
+      for (int i = 0; i < input.getMeasurements().length; i++) {
 	if (i > 0)
 	  content.append(separator.getValue());
-	content.append(input.getPerformanceMeasurements()[i].getName());
+	content.append(input.getMeasurements()[i].getName());
       }
       content.append("\n");
     }
 
     // values
-    for (int i = 0; i < input.getPerformanceMeasurements().length; i++) {
+    for (int i = 0; i < input.getMeasurements().length; i++) {
       if (i > 0)
 	content.append(separator.getValue());
-      content.append(input.getPerformanceMeasurements()[i].getValue());
+      content.append(input.getMeasurements()[i].getValue());
     }
     content.append("\n");
 

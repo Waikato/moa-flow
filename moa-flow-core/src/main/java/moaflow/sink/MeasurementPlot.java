@@ -22,10 +22,8 @@ package moaflow.sink;
 
 import com.github.javacliparser.IntOption;
 import com.github.javacliparser.StringOption;
-import com.yahoo.labs.samoa.instances.Instance;
-import moa.core.Example;
 import moa.core.Measurement;
-import moa.evaluation.LearningPerformanceEvaluator;
+import moa.evaluation.LearningEvaluation;
 import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XYChart;
 
@@ -39,7 +37,7 @@ import java.util.List;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class MeasurementPlot
-  extends AbstractSink<LearningPerformanceEvaluator<Example<Instance>>> {
+  extends AbstractSink<LearningEvaluation> {
 
   public StringOption measurement = new StringOption("measurement", 'm', "The measurement to plot", "classifications correct (percent)");
 
@@ -96,9 +94,9 @@ public class MeasurementPlot
    * @param input the data to process
    */
   @Override
-  protected void doProcess(LearningPerformanceEvaluator<Example<Instance>> input) {
+  protected void doProcess(LearningEvaluation input) {
     Double value = null;
-    for (Measurement m: input.getPerformanceMeasurements()) {
+    for (Measurement m: input.getMeasurements()) {
       if (m.getName().equals(measurement.getValue())) {
         value = m.getValue();
         break;
