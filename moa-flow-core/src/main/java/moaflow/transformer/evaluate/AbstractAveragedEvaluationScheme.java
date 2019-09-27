@@ -52,6 +52,10 @@ public abstract class AbstractAveragedEvaluationScheme
   protected LearningPerformanceEvaluator[] m_Evaluators;
 
   /**
+   * Buffer of instances to use for training with delayed algorithm
+   */
+  protected LinkedList<LinkedList<Example>> trainInstances;
+  /**
    * Gets the number of folds to evaluate.
    */
   public int numFolds() {
@@ -72,7 +76,9 @@ public abstract class AbstractAveragedEvaluationScheme
     // Create the fold learners and evaluators
     m_Learners = new Learner[numFolds()];
     m_Evaluators = new LearningPerformanceEvaluator[numFolds()];
+    trainInstances = new LinkedList<LinkedList<Example>>();
     for (int i = 0; i < numFolds(); i++) {
+      trainInstances.add(new LinkedList<Example>());
       m_Learners[i] = (Learner) m_BaseLearner.copy();
       m_Learners[i].setModelContext(m_BaseLearner.getModelContext());
       m_Evaluators[i] = (LearningPerformanceEvaluator) m_BaseEvaluator.copy();
@@ -87,8 +93,9 @@ public abstract class AbstractAveragedEvaluationScheme
   @Override
   public void performEvaluation(Example<Instance> instance) {
     // Perform the single evaluation scheme on each learner/evaluator pair
-    for (int i = 0; i < numFolds(); i++)
+    for (int i = 0; i < numFolds(); i++){
       performSingleEvaluation(i, instance, m_Learners[i], m_Evaluators[i]);
+    }
   }
 
   /**
