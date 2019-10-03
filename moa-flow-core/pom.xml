@@ -60,6 +60,12 @@
       <artifactId>xchart</artifactId>
       <version>3.5.4</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.github.waikato.thirdparty</groupId>
+      <artifactId>ijava</artifactId>
+      <version>1.3.0</version>
+    </dependency>
   </dependencies>
 
   <build>

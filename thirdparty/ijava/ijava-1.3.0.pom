@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.github.waikato.thirdparty</groupId>
+  <artifactId>ijava</artifactId>
+  <packaging>jar</packaging>
+  <version>1.3.0</version>
+
+  <name>IJava</name>
+
+  <description>
+    Third-party Maven release of IJava.
+  </description>
+
+  <url>https://github.com/SpencerPark/IJava</url>
+
+  <developers>
+    <developer>
+      <id>SpencerPark</id>
+      <name>Spencer Park</name>
+      <email>spinnr95@gmail.com</email>
+    </developer>
+  </developers>
+
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>https://opensource.org/licenses/MIT</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:https://github.com/SpencerPark/IJava</connection>
+    <developerConnection>scm:git:https://github.com/SpencerPark/IJava</developerConnection>
+    <url>https://github.com/SpencerPark/IJava</url>
+  </scm>
+</project>
