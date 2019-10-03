@@ -1,5 +1,8 @@
 # How To Release IJava to Maven
 
+**These notes refer to version 1.3.0; replace with the specific version you
+are using.**
+
 ## Binary
 
 * Download release archive:
