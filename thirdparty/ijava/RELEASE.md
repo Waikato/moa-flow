@@ -17,9 +17,9 @@ are using.**
 
   https://github.com/SpencerPark/IJava/archive/v1.3.0.zip
 
-* Extract and merge `src/main/java` an extract `src/main/resources`
+* Extract and merge directories `src/main/java` and `src/main/resources`
 
-* Generate jar out of it (from inside the top-level directory of the sources, about `io`):
+* Generate jar out of it (from inside the top-level directory of the sources, above `io`):
 
   ```
   jar -cf ../ijava-1.3.0-sources.jar .
@@ -58,3 +58,4 @@ are using.**
   http://maven.apache.org/plugins/maven-gpg-plugin/sign-and-deploy-file-mojo.html
 
 * Close and release the repository on the Sonatype Nexus
+
