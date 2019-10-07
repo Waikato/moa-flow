@@ -31,9 +31,13 @@ Package: `com.github.fracpete.moaflow.transformer`
 Package: `com.github.fracpete.moaflow.sink`
 
 * `Console` - simply outputs any objects it receives via `toString()`
+* `DrawTable` - draws a table
 * `MeasurementPlot` - for plotting a single measurement
 * `MeasurementsToCSV` - stores the measurements from an evaluation as CSV
+* `MeasurementTableSawPlot` - plots realtime chart on web-browser using Jupyter Notebook and IJava
+* `OutputLearningCurve` - outputs the whole learning curve of MOA in a table format
 * `WriteModel` - stores a model on disk
+
 
 
 ## Examples
@@ -49,6 +53,7 @@ Package: `com.github.fracpete.moaflow.sink`
 * [RegressionConstructSaveLoadRun](moa-flow-examples/src/main/java/moaflow/examples/RegressionConstructSaveLoadRun.java) -- constructs, 
   saves, loads and runs a flow that evaluates a regressor, outputs the statistics in a CSV, 
   also trains the model and stores it on disk 
+* [ClassificationVariousSchemaTablePlot](moa-flow-examples/src/main/java/moaflow/examples/ClassificationVariousSchemaTablePlot.java) -- uses different evaluation schemes, output a table of learning curves and plots a statistic with TableSaw (only works with IJava and Jupyter Notebook)
 
 
 ## Modules
