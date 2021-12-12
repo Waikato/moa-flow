@@ -10,18 +10,22 @@ public class DrawTable {
     protected int[] columnWidths = null;
     String[] dataRow = null;
 
-    /** sets the width of each column**/
-    private void setColumnWidth(){
+    /**
+     * sets the width of each column
+     **/
+    private void setColumnWidth() {
         this.columnWidths = new int[this.dataRow.length];
         for (int i = 0; i < this.dataRow.length; i++) {
             this.columnWidths[i] = this.dataRow[i].length() > 25 ? this.dataRow[i].length() : 25;
         }
     }
 
-    /** Gets the header of learning curve
+    /**
+     * Gets the header of learning curve
+     *
      * @return the output string in table form
-     * **/
-    public StringBuilder headerLine(String str){
+     **/
+    public StringBuilder headerLine(String str) {
         this.dataRow = str.split(",");
         setColumnWidth();
         StringBuilder output = new StringBuilder();
@@ -48,15 +52,17 @@ public class DrawTable {
         return output;
     }
 
-    /** Gets a body line of learning curve
+    /**
+     * Gets a body line of learning curve
+     *
      * @return the output string in table form
-     * **/
-    public StringBuilder bodyLine(String str){
+     **/
+    public StringBuilder bodyLine(String str) {
         this.dataRow = str.split(",");
         StringBuilder output = new StringBuilder();
         for (int col = 0; col < this.dataRow.length; col++) {
             output.append(col == 0 ? '║' : '│');
-            if(this.dataRow[col].length() > this.columnWidths[col])
+            if (this.dataRow[col].length() > this.columnWidths[col])
                 this.columnWidths[col] = this.dataRow[col].length();
             output.append(String.format(" %1$-" + this.columnWidths[col] + "s ", this.dataRow[col]));
         }
@@ -73,5 +79,12 @@ public class DrawTable {
 
         return output;
     }
+
+    public StringBuilder plainCSV(String str) {
+        StringBuilder output = new StringBuilder();
+        output.append(str).append('\n');
+        return output;
+    }
+
 }
 
